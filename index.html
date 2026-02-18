@@ -1,172 +1,249 @@
 <!doctype html>
 <html lang="es" class="h-full">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Calculador de Cilindros</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculador de Cilindros</title>
 
-<script src="https://cdn.tailwindcss.com/3.4.17"></script>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
 
-<style>
-* { font-family: 'Nunito', sans-serif; }
+  <style>
+    * { font-family: 'Nunito', sans-serif; }
+    body { box-sizing: border-box; }
 
-.formula-step{
-  opacity: 1;
-  transform: translateX(0);
-}
+    /* ✅ FIX iOS/Reduce Motion: visible por defecto; animación solo si se permite */
+    .formula-step{
+      opacity: 1;
+      transform: translateX(0);
+      will-change: opacity, transform;
+    }
+    @media (prefers-reduced-motion: no-preference) {
+      .formula-step{
+        opacity: 0;
+        transform: translateX(20px);
+        animation: fadeInStep 0.55s ease forwards;
+      }
+    }
+    @keyframes fadeInStep { to { opacity: 1; transform: translateX(0); } }
 
-@media (prefers-reduced-motion: no-preference) {
-  .formula-step{
-    opacity: 0;
-    transform: translateX(20px);
-    animation: fadeInStep 0.5s ease forwards;
-  }
-}
+    .result-box { animation: pulseResult 2s ease-in-out infinite; }
+    @keyframes pulseResult{
+      0%,100%{ box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
+      50%{ box-shadow: 0 0 0 10px rgba(16,185,129,0); }
+    }
 
-@keyframes fadeInStep {
-  to { opacity: 1; transform: translateX(0); }
-}
+    /* Solo por estética: un “glow” suave en cards */
+    .card-glow { box-shadow: 0 10px 40px rgba(0,0,0,0.35); }
 
-.result-box {
-  animation: pulseResult 2s ease-in-out infinite;
-}
-
-@keyframes pulseResult {
-  0%,100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(16,185,129,0); }
-}
-</style>
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button { opacity: 1; height: 32px; }
+  </style>
 </head>
 
 <body class="h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-auto">
-<div class="min-h-full w-full p-6">
+  <div class="min-h-full w-full p-6">
 
-<header class="text-center mb-8">
-  <h1 class="text-4xl font-extrabold text-white mb-2 drop-shadow-lg">
-    🔷 Calculador de Cilindros
-  </h1>
-  <p class="text-purple-200 text-lg">
-    Aprende a calcular el volumen paso a paso
-  </p>
-</header>
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 class="text-4xl font-extrabold text-white mb-2 drop-shadow-lg">🔷 Calculador de Cilindros</h1>
+      <p class="text-purple-200 text-lg">Aprende a calcular el volumen paso a paso</p>
+    </header>
 
-<div class="max-w-4xl mx-auto space-y-6">
+    <!-- Orden: Recuerda -> Ingresa datos -> Procedimiento -> Resultado -->
+    <div class="max-w-4xl mx-auto space-y-6">
 
-<!-- RECUERDA -->
-<div class="p-5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-3xl border border-amber-400/30 backdrop-blur-lg">
-  <h3 class="text-amber-200 font-bold mb-3 text-sm uppercase tracking-wide">
-    📚 Recuerda
-  </h3>
-  <div class="text-white space-y-2">
-    <p>• π ≈ 3.1416</p>
-    <p>• r² significa r × r</p>
-    <p>• u³ = unidades cúbicas</p>
-  </div>
-</div>
+      <!-- Recuerda -->
+      <div class="p-5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-3xl border border-amber-400/30 backdrop-blur-lg card-glow">
+        <h3 class="text-amber-200 font-bold mb-3 text-sm uppercase tracking-wide">📚 Recuerda</h3>
+        <div class="text-white space-y-2">
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">π (pi) ≈ 3.14159...</span></p>
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">r² significa r × r</span></p>
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">u³ = unidades cúbicas</span></p>
+        </div>
+      </div>
 
-<!-- INGRESA DATOS -->
-<div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-2xl">
-  <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-    📝 Ingresa los datos
-  </h2>
+      <!-- Ingresa los datos -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 card-glow">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-sm">📝</span>
+          Ingresa los datos
+        </h2>
 
-  <div class="space-y-5">
+        <div class="space-y-5">
+          <div class="group">
+            <label class="block text-purple-200 font-semibold mb-2 text-sm uppercase tracking-wide">Radio (r)</label>
+            <div class="relative">
+              <input
+                type="number"
+                id="radio-input"
+                min="0.1"
+                step="0.1"
+                value="5"
+                class="w-full px-5 py-4 bg-white/10 border-2 border-purple-400/50 rounded-2xl text-white text-xl font-bold focus:outline-none focus:border-indigo-400 focus:bg-white/20 transition-all placeholder-purple-300/50"
+                placeholder="Ej: 5"
+              />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-purple-300 font-medium">u</span>
+            </div>
+          </div>
 
-    <div>
-      <label class="block text-purple-200 mb-2">Radio (r)</label>
-      <input type="number" id="radio" value="5" min="0.1" step="0.1"
-      class="w-full px-4 py-3 rounded-2xl bg-white/10 border border-purple-400/40 text-white"/>
+          <div class="group">
+            <label class="block text-purple-200 font-semibold mb-2 text-sm uppercase tracking-wide">Altura (h)</label>
+            <div class="relative">
+              <input
+                type="number"
+                id="altura-input"
+                min="0.1"
+                step="0.1"
+                value="10"
+                class="w-full px-5 py-4 bg-white/10 border-2 border-purple-400/50 rounded-2xl text-white text-xl font-bold focus:outline-none focus:border-indigo-400 focus:bg-white/20 transition-all placeholder-purple-300/50"
+                placeholder="Ej: 10"
+              />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-purple-300 font-medium">u</span>
+            </div>
+          </div>
+
+          <button
+            id="calcular-btn"
+            class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
+          >
+            <span>⚡</span> Calcular Volumen
+          </button>
+        </div>
+      </div>
+
+      <!-- Procedimiento (animado como OG, pero seguro en iOS) -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 card-glow">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-sm">📐</span>
+          Procedimiento
+        </h2>
+        <div id="procedimiento-container" class="space-y-4"></div>
+      </div>
+
+      <!-- Resultado -->
+      <div id="resultado-panel" class="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-lg rounded-3xl p-6 border border-emerald-400/30 card-glow">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-sm">✨</span>
+          Resultado
+        </h2>
+        <div class="result-box bg-white/10 rounded-2xl p-6 text-center border border-emerald-400/30">
+          <p class="text-emerald-200 text-sm uppercase tracking-wide mb-2">Volumen del cilindro</p>
+          <p id="resultado-valor" class="text-5xl font-extrabold text-white mb-1">785.40</p>
+          <p class="text-emerald-300 text-xl font-semibold">u³</p>
+        </div>
+      </div>
+
     </div>
 
-    <div>
-      <label class="block text-purple-200 mb-2">Altura (h)</label>
-      <input type="number" id="altura" value="10" min="0.1" step="0.1"
-      class="w-full px-4 py-3 rounded-2xl bg-white/10 border border-purple-400/40 text-white"/>
-    </div>
-
-    <button id="calcular"
-      class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600
-      text-white font-bold rounded-2xl hover:scale-[1.02] transition-all">
-      ⚡ Calcular Volumen
-    </button>
+    <footer class="mt-8 text-center text-purple-300/70 text-sm">
+      <p>💡 El volumen de un cilindro es el espacio que ocupa en tres dimensiones</p>
+    </footer>
   </div>
-</div>
 
-<!-- PROCEDIMIENTO -->
-<div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-2xl">
-  <h2 class="text-xl font-bold text-white mb-6">
-    📐 Procedimiento
-  </h2>
-  <div id="procedimiento" class="space-y-4"></div>
-</div>
+  <script>
+    const radioInput = document.getElementById('radio-input');
+    const alturaInput = document.getElementById('altura-input');
+    const calcularBtn = document.getElementById('calcular-btn');
+    const resultadoValor = document.getElementById('resultado-valor');
+    const procedimientoContainer = document.getElementById('procedimiento-container');
 
-<!-- RESULTADO -->
-<div class="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-lg rounded-3xl p-6 border border-emerald-400/30 shadow-2xl">
-  <h2 class="text-xl font-bold text-white mb-4">
-    ✨ Resultado
-  </h2>
-  <div class="result-box bg-white/10 rounded-2xl p-6 text-center border border-emerald-400/30">
-    <p class="text-emerald-200 mb-2">Volumen del cilindro</p>
-    <p id="resultado" class="text-5xl font-extrabold text-white">785.40</p>
-    <p class="text-emerald-300 text-xl">u³</p>
-  </div>
-</div>
+    function calcularVolumen() {
+      const r = parseFloat(radioInput.value) || 0;
+      const h = parseFloat(alturaInput.value) || 0;
 
-</div>
-</div>
+      if (r <= 0 || h <= 0) {
+        resultadoValor.textContent = '---';
+        procedimientoContainer.innerHTML = `
+          <div class="bg-red-500/20 text-red-200 p-4 rounded-xl border border-red-400/30 text-center">
+            ⚠️ Por favor ingresa valores mayores a cero
+          </div>
+        `;
+        return;
+      }
 
-<script>
-const radioInput = document.getElementById("radio");
-const alturaInput = document.getElementById("altura");
-const resultado = document.getElementById("resultado");
-const procedimiento = document.getElementById("procedimiento");
-const btn = document.getElementById("calcular");
+      const pi = Math.PI;
+      const rCuadrado = r * r;
+      const volumen = pi * rCuadrado * h;
 
-function calcularVolumen(){
-  const r = parseFloat(radioInput.value);
-  const h = parseFloat(alturaInput.value);
+      resultadoValor.textContent = volumen.toFixed(2);
 
-  if(!r || !h || r <= 0 || h <= 0){
-    resultado.textContent = "---";
-    procedimiento.innerHTML =
-      `<div class="bg-red-500/20 p-4 rounded-xl text-red-200">
-      Ingresa valores mayores que cero
-      </div>`;
-    return;
-  }
+      // ✅ Re-render para que la animación se “reinicie” al recalcular
+      procedimientoContainer.innerHTML = '';
 
-  const pi = Math.PI;
-  const r2 = r * r;
-  const volumen = pi * r2 * h;
+      const pasos = [
+        {
+          titulo: 'Paso 1: Fórmula general',
+          formula: 'V = π · r² · h',
+          explicacion: 'La fórmula del volumen del cilindro',
+          color: 'from-blue-500/20 to-indigo-500/20',
+          borderColor: 'border-blue-400/30'
+        },
+        {
+          titulo: 'Paso 2: Sustituir valores',
+          formula: `V = π · (${r})² · ${h}`,
+          explicacion: `Reemplazamos r = ${r} y h = ${h}`,
+          color: 'from-purple-500/20 to-pink-500/20',
+          borderColor: 'border-purple-400/30'
+        },
+        {
+          titulo: 'Paso 3: Calcular r²',
+          formula: `V = π · ${rCuadrado.toFixed(2)} · ${h}`,
+          explicacion: `${r} × ${r} = ${rCuadrado.toFixed(2)}`,
+          color: 'from-amber-500/20 to-orange-500/20',
+          borderColor: 'border-amber-400/30'
+        },
+        {
+          titulo: 'Paso 4: Multiplicar',
+          formula: `V = ${pi.toFixed(4)} · ${(rCuadrado * h).toFixed(2)}`,
+          explicacion: `${rCuadrado.toFixed(2)} × ${h} = ${(rCuadrado * h).toFixed(2)}`,
+          color: 'from-teal-500/20 to-cyan-500/20',
+          borderColor: 'border-teal-400/30'
+        },
+        {
+          titulo: 'Paso 5: Resultado final',
+          formula: `V = ${volumen.toFixed(2)} u³`,
+          explicacion: `${pi.toFixed(4)} × ${(rCuadrado * h).toFixed(2)} = ${volumen.toFixed(2)}`,
+          color: 'from-emerald-500/20 to-green-500/20',
+          borderColor: 'border-emerald-400/30',
+          destacado: true
+        }
+      ];
 
-  resultado.textContent = volumen.toFixed(2);
+      pasos.forEach((paso, index) => {
+        const el = document.createElement('div');
+        el.className =
+          `formula-step bg-gradient-to-r ${paso.color} rounded-2xl p-5 border ${paso.borderColor} ` +
+          (paso.destacado ? 'ring-2 ring-emerald-400/50' : '');
 
-  procedimiento.innerHTML = `
-  <div class="formula-step bg-white/5 p-4 rounded-xl">
-    1️⃣ Fórmula: V = π · r² · h
-  </div>
-  <div class="formula-step bg-white/5 p-4 rounded-xl">
-    2️⃣ Sustituimos: V = π · (${r})² · ${h}
-  </div>
-  <div class="formula-step bg-white/5 p-4 rounded-xl">
-    3️⃣ r² = ${r2.toFixed(2)}
-  </div>
-  <div class="formula-step bg-white/5 p-4 rounded-xl">
-    4️⃣ Multiplicamos: ${pi.toFixed(4)} × ${(r2*h).toFixed(2)}
-  </div>
-  <div class="formula-step bg-emerald-500/20 p-4 rounded-xl border border-emerald-400/40">
-    5️⃣ Resultado final: V = ${volumen.toFixed(2)} u³
-  </div>
-  `;
-}
+        // ✅ Mantener el “stagger” visual del OG
+        // (Esto funciona incluso si reduce-motion está activo; solo no animará, pero sí se verá)
+        el.style.animationDelay = `${index * 0.15}s`;
 
-btn.addEventListener("click", calcularVolumen);
-radioInput.addEventListener("keydown", e => { if(e.key==="Enter") calcularVolumen(); });
-alturaInput.addEventListener("keydown", e => { if(e.key==="Enter") calcularVolumen(); });
+        el.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              ${index + 1}
+            </div>
+            <div class="flex-1">
+              <h4 class="text-white font-bold text-sm mb-2">${paso.titulo}</h4>
+              <div class="bg-black/20 rounded-xl px-4 py-3 mb-2">
+                <p class="text-white font-mono text-xl font-bold text-center">${paso.formula}</p>
+              </div>
+              <p class="text-purple-200 text-sm">${paso.explicacion}</p>
+            </div>
+          </div>
+        `;
 
-calcularVolumen();
-</script>
+        procedimientoContainer.appendChild(el);
+      });
+    }
 
+    calcularBtn.addEventListener('click', calcularVolumen);
+    radioInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') calcularVolumen(); });
+    alturaInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') calcularVolumen(); });
+
+    calcularVolumen();
+  </script>
 </body>
 </html>
