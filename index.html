@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculador de Cilindros</title>
+
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    * { font-family: 'Nunito', sans-serif; }
+    body { box-sizing: border-box; }
+
+    .formula-step {
+      opacity: 0;
+      transform: translateX(20px);
+      animation: fadeInStep 0.5s ease forwards;
+    }
+    .formula-step:nth-child(1) { animation-delay: 0.1s; }
+    .formula-step:nth-child(2) { animation-delay: 0.3s; }
+    .formula-step:nth-child(3) { animation-delay: 0.5s; }
+    .formula-step:nth-child(4) { animation-delay: 0.7s; }
+
+    @keyframes fadeInStep {
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .result-box {
+      animation: pulseResult 2s ease-in-out infinite;
+    }
+
+    @keyframes pulseResult {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+      50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      opacity: 1;
+      height: 32px;
+    }
+  </style>
+</head>
+
+<body class="h-full bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-auto">
+  <div class="min-h-full w-full p-6">
+    <!-- Header -->
+    <header class="text-center mb-8">
+      <h1 id="main-title" class="text-4xl font-extrabold text-white mb-2 drop-shadow-lg">🔷 Calculador de Cilindros</h1>
+      <p class="text-purple-200 text-lg">Aprende a calcular el volumen paso a paso</p>
+    </header>
+
+    <!-- Nuevo orden: Recuerda -> Ingresa datos -> Procedimiento -> Resultado -->
+    <div class="max-w-4xl mx-auto space-y-6">
+
+      <!-- 1) Recuerda -->
+      <div class="p-5 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-3xl border border-amber-400/30 backdrop-blur-lg">
+        <h3 class="text-amber-200 font-bold mb-3 text-sm uppercase tracking-wide">📚 Recuerda</h3>
+        <div class="text-white space-y-2">
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">π (pi) ≈ 3.14159...</span></p>
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">r² significa r × r</span></p>
+          <p class="flex items-center gap-2"><span class="text-amber-400">•</span> <span class="font-mono">u³ = unidades cúbicas</span></p>
+        </div>
+      </div>
+
+      <!-- 2) Ingresa los datos -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-2xl">
+        <h2 id="input-section-title" class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-sm">📝</span>
+          Ingresa los datos
+        </h2>
+
+        <div class="space-y-5">
+          <!-- Radio -->
+          <div class="group">
+            <label class="block text-purple-200 font-semibold mb-2 text-sm uppercase tracking-wide">Radio (r)</label>
+            <div class="relative">
+              <input
+                type="number"
+                id="radio-input"
+                min="0.1"
+                step="0.1"
+                value="5"
+                class="w-full px-5 py-4 bg-white/10 border-2 border-purple-400/50 rounded-2xl text-white text-xl font-bold focus:outline-none focus:border-indigo-400 focus:bg-white/20 transition-all placeholder-purple-300/50"
+                placeholder="Ej: 5"
+              />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-purple-300 font-medium">u</span>
+            </div>
+          </div>
+
+          <!-- Altura -->
+          <div class="group">
+            <label class="block text-purple-200 font-semibold mb-2 text-sm uppercase tracking-wide">Altura (h)</label>
+            <div class="relative">
+              <input
+                type="number"
+                id="altura-input"
+                min="0.1"
+                step="0.1"
+                value="10"
+                class="w-full px-5 py-4 bg-white/10 border-2 border-purple-400/50 rounded-2xl text-white text-xl font-bold focus:outline-none focus:border-indigo-400 focus:bg-white/20 transition-all placeholder-purple-300/50"
+                placeholder="Ej: 10"
+              />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-purple-300 font-medium">u</span>
+            </div>
+          </div>
+
+          <button
+            id="calcular-btn"
+            class="w-full py-4 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-bold text-lg rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center gap-2"
+          >
+            <span>⚡</span> Calcular Volumen
+          </button>
+
+          <div class="flex justify-center gap-8 mt-4 text-sm">
+            <div class="text-center">
+              <span class="text-purple-300">Radio</span>
+              <p id="display-radio" class="text-white font-bold text-lg">r = 5 u</p>
+            </div>
+            <div class="text-center">
+              <span class="text-purple-300">Altura</span>
+              <p id="display-altura" class="text-white font-bold text-lg">h = 10 u</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3) Procedimiento -->
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 shadow-2xl">
+        <h2 id="procedure-section-title" class="text-xl font-bold text-white mb-6 flex items-center gap-2">
+          <span class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-sm">📐</span>
+          Procedimiento
+        </h2>
+        <div id="procedimiento-container" class="space-y-4">
+          <!-- Los pasos se generan dinámicamente -->
+        </div>
+      </div>
+
+      <!-- 4) Resultado -->
+      <div id="resultado-panel" class="bg-gradient-to-br from-emerald-500/20 to-teal-500/20 backdrop-blur-lg rounded-3xl p-6 border border-emerald-400/30 shadow-2xl">
+        <h2 id="result-section-title" class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+          <span class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-sm">✨</span>
+          Resultado
+        </h2>
+        <div class="result-box bg-white/10 rounded-2xl p-6 text-center border border-emerald-400/30">
+          <p class="text-emerald-200 text-sm uppercase tracking-wide mb-2">Volumen del cilindro</p>
+          <p id="resultado-valor" class="text-5xl font-extrabold text-white mb-1">785.40</p>
+          <p class="text-emerald-300 text-xl font-semibold">u³</p>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="mt-8 text-center text-purple-300/70 text-sm">
+      <p>💡 El volumen de un cilindro es el espacio que ocupa en tres dimensiones</p>
+    </footer>
+  </div>
+
+  <script>
+    // Default configuration
+    const defaultConfig = {
+      main_title: '🔷 Calculador de Cilindros',
+      input_section_title: 'Ingresa los datos',
+      result_section_title: 'Resultado',
+      procedure_section_title: 'Procedimiento',
+      background_color: '#0f172a',
+      surface_color: '#1e1b4b',
+      text_color: '#ffffff',
+      primary_action_color: '#6366f1',
+      secondary_action_color: '#10b981',
+      font_family: 'Nunito',
+      font_size: 16
+    };
+
+    // Initialize Element SDK
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        const mainTitle = document.getElementById('main-title');
+        const inputTitle = document.getElementById('input-section-title');
+        const resultTitle = document.getElementById('result-section-title');
+        const procedureTitle = document.getElementById('procedure-section-title');
+
+        // Update text content (fix: no depender de childNodes[0])
+        if (mainTitle) {
+          mainTitle.textContent = config.main_title || defaultConfig.main_title;
+        }
+        if (inputTitle) {
+          inputTitle.innerHTML =
+            `<span class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-sm">📝</span>` +
+            (config.input_section_title || defaultConfig.input_section_title);
+        }
+        if (resultTitle) {
+          resultTitle.innerHTML =
+            `<span class="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-sm">✨</span>` +
+            (config.result_section_title || defaultConfig.result_section_title);
+        }
+        if (procedureTitle) {
+          procedureTitle.innerHTML =
+            `<span class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center text-sm">📐</span>` +
+            (config.procedure_section_title || defaultConfig.procedure_section_title);
+        }
+
+        // Update colors (opcional; tu UI usa tailwind, pero queda para SDK)
+        document.body.style.setProperty('--bg-color', config.background_color || defaultConfig.background_color);
+        document.body.style.setProperty('--primary-color', config.primary_action_color || defaultConfig.primary_action_color);
+
+        // Update fonts
+        const fontFamily = config.font_family || defaultConfig.font_family;
+        document.body.style.fontFamily = `${fontFamily}, sans-serif`;
+
+        const baseSize = config.font_size || defaultConfig.font_size;
+        if (mainTitle) mainTitle.style.fontSize = `${baseSize * 2.5}px`;
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.background_color || defaultConfig.background_color, set: (v) => window.elementSdk.setConfig({ background_color: v }) },
+          { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => window.elementSdk.setConfig({ surface_color: v }) },
+          { get: () => config.text_color || defaultConfig.text_color, set: (v) => window.elementSdk.setConfig({ text_color: v }) },
+          { get: () => config.primary_action_color || defaultConfig.primary_action_color, set: (v) => window.elementSdk.setConfig({ primary_action_color: v }) },
+          { get: () => config.secondary_action_color || defaultConfig.secondary_action_color, set: (v) => window.elementSdk.setConfig({ secondary_action_color: v }) }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (v) => window.elementSdk.setConfig({ font_family: v })
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (v) => window.elementSdk.setConfig({ font_size: v })
+        }
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['main_title', config.main_title || defaultConfig.main_title],
+        ['input_section_title', config.input_section_title || defaultConfig.input_section_title],
+        ['result_section_title', config.result_section_title || defaultConfig.result_section_title],
+        ['procedure_section_title', config.procedure_section_title || defaultConfig.procedure_section_title]
+      ])
+    });
+
+    // Calculator functionality
+    const radioInput = document.getElementById('radio-input');
+    const alturaInput = document.getElementById('altura-input');
+    const calcularBtn = document.getElementById('calcular-btn');
+    const resultadoValor = document.getElementById('resultado-valor');
+    const procedimientoContainer = document.getElementById('procedimiento-container');
+    const displayRadio = document.getElementById('display-radio');
+    const displayAltura = document.getElementById('display-altura');
+
+    function calcularVolumen() {
+      const r = parseFloat(radioInput.value) || 0;
+      const h = parseFloat(alturaInput.value) || 0;
+
+      if (r <= 0 || h <= 0) {
+        resultadoValor.textContent = '---';
+        procedimientoContainer.innerHTML = `
+          <div class="bg-red-500/20 text-red-200 p-4 rounded-xl border border-red-400/30 text-center">
+            ⚠️ Por favor ingresa valores mayores a cero
+          </div>
+        `;
+        return;
+      }
+
+      const pi = Math.PI;
+      const rCuadrado = r * r;
+      const volumen = pi * rCuadrado * h;
+
+      resultadoValor.textContent = volumen.toFixed(2);
+      displayRadio.textContent = `r = ${r} u`;
+      displayAltura.textContent = `h = ${h} u`;
+
+      procedimientoContainer.innerHTML = '';
+
+      const pasos = [
+        {
+          titulo: 'Paso 1: Fórmula general',
+          formula: 'V = π · r² · h',
+          explicacion: 'La fórmula del volumen del cilindro',
+          color: 'from-blue-500/20 to-indigo-500/20',
+          borderColor: 'border-blue-400/30'
+        },
+        {
+          titulo: 'Paso 2: Sustituir valores',
+          formula: `V = π · (${r})² · ${h}`,
+          explicacion: `Reemplazamos r = ${r} y h = ${h}`,
+          color: 'from-purple-500/20 to-pink-500/20',
+          borderColor: 'border-purple-400/30'
+        },
+        {
+          titulo: 'Paso 3: Calcular r²',
+          formula: `V = π · ${rCuadrado.toFixed(2)} · ${h}`,
+          explicacion: `${r} × ${r} = ${rCuadrado.toFixed(2)}`,
+          color: 'from-amber-500/20 to-orange-500/20',
+          borderColor: 'border-amber-400/30'
+        },
+        {
+          titulo: 'Paso 4: Multiplicar',
+          formula: `V = ${pi.toFixed(4)} · ${(rCuadrado * h).toFixed(2)}`,
+          explicacion: `${rCuadrado.toFixed(2)} × ${h} = ${(rCuadrado * h).toFixed(2)}`,
+          color: 'from-teal-500/20 to-cyan-500/20',
+          borderColor: 'border-teal-400/30'
+        },
+        {
+          titulo: 'Paso 5: Resultado final',
+          formula: `V = ${volumen.toFixed(2)} u³`,
+          explicacion: `${pi.toFixed(4)} × ${(rCuadrado * h).toFixed(2)} = ${volumen.toFixed(2)}`,
+          color: 'from-emerald-500/20 to-green-500/20',
+          borderColor: 'border-emerald-400/30',
+          destacado: true
+        }
+      ];
+
+      pasos.forEach((paso, index) => {
+        const pasoElement = document.createElement('div');
+        pasoElement.className =
+          `formula-step bg-gradient-to-r ${paso.color} rounded-2xl p-5 border ${paso.borderColor} ` +
+          (paso.destacado ? 'ring-2 ring-emerald-400/50' : '');
+        pasoElement.style.animationDelay = `${index * 0.15}s`;
+
+        pasoElement.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+              ${index + 1}
+            </div>
+            <div class="flex-1">
+              <h4 class="text-white font-bold text-sm mb-2">${paso.titulo}</h4>
+              <div class="bg-black/20 rounded-xl px-4 py-3 mb-2">
+                <p class="text-white font-mono text-xl font-bold text-center">${paso.formula}</p>
+              </div>
+              <p class="text-purple-200 text-sm">${paso.explicacion}</p>
+            </div>
+          </div>
+        `;
+        procedimientoContainer.appendChild(pasoElement);
+      });
+    }
+
+    calcularBtn.addEventListener('click', calcularVolumen);
+    radioInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') calcularVolumen(); });
+    alturaInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') calcularVolumen(); });
+
+    calcularVolumen();
+  </script>
+
+  <!-- Nota: este script de Cloudflare normalmente no debe ir en tu HTML fuente. Si te lo pegó una página,
+       puedes eliminarlo sin afectar el calculador. -->
+</body>
+</html>
